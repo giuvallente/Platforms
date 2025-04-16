@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 import httpx
 
 app = FastAPI()
@@ -6,7 +6,12 @@ app = FastAPI()
 EXCHANGE_API_URL = 'https://economia.awesomeapi.com.br/json/last/'
 
 @app.get("/exchange/{from_currency}/{to_currency}")
-def get_exchange_rate(from_currency: str, to_currency: str):
+def get_exchange_rate(from_currency, to_currency, request):
+
+    user_id = request.headers.get("id-account") 
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID is required in headers")
+
     url = f"{EXCHANGE_API_URL}{from_currency.upper()}-{to_currency.upper()}"
     
     try:
@@ -21,7 +26,7 @@ def get_exchange_rate(from_currency: str, to_currency: str):
             "sell": data[f"{from_currency.upper()}{to_currency.upper()}"]['ask'],  
             "buy": data[f"{from_currency.upper()}{to_currency.upper()}"]['bid'],
             "date": data[f"{from_currency.upper()}{to_currency.upper()}"]['create_date'],
-            "id-account": "some-unique-id"
+            "id-account": user_id
         }
     except httpx.HTTPError as e:
         raise HTTPException(status_code=500, detail=f"Error fetching exchange rate: {str(e)}")
