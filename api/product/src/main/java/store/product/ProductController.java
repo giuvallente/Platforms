@@ -19,9 +19,9 @@ public interface ProductController {
     @GetMapping("/product")
     public ResponseEntity<List<ProductOut>> findAll();
 
-    @GetMapping("/product/{productId}")
-    public ResponseEntity<ProductOut> findProduct(@PathVariable String productId);
+    @GetMapping("/product/{id}")
+    public ResponseEntity<ProductOut> findProduct(@PathVariable String id);
 
-    @DeleteMapping("product/{productId}")
-    public void deleteProduct(@PathVariable String productId);
+    @DeleteMapping("product/{id}")
+    public void deleteProduct(@PathVariable String id);
 }

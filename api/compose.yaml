@@ -48,3 +48,23 @@ services:
       dockerfile: Dockerfile
     # ports:
     #   - 8081:80
+  
+  product:
+    hostname: product
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: ${POSTGRES_USER:-store}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-store}
+  
+  order:
+    hostname: order
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: ${POSTGRES_USER:-store}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-store}

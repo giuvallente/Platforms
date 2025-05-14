@@ -9,11 +9,6 @@ spring:
     gateway:
       routes:
 
-        # - id: google
-        #   uri: https://www.google.com
-        #   predicates:
-        #     - Path=/google/**
-
         - id: account
           uri: http://account:8080
           predicates:
@@ -24,10 +19,21 @@ spring:
           predicates:
             - Path=/auth/**
 
-        # - id: exchange
-        #   uri: http://exchange:80
-        #   predicates:
-        #     - Path=/exchange/**
+        - id: exchange
+          uri: http://exchange:80
+          predicates:
+            - Path=/exchange/**
+        
+        - id: product
+          uri: http://product:8080
+          predicates:
+            - Path=/product/**
+        
+        - id: order
+          uri: http://order:8080
+          predicates:
+            - Path=/order/**
+        
 
 logging:
   level:
