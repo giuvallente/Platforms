@@ -4,18 +4,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import store.product.ProductController;
 import store.product.ProductOut;
 
 @Service
 public class OrderService {
-
-    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     private ProductController productController;
@@ -33,9 +31,7 @@ public class OrderService {
         order.itens().forEach(item -> {
             ProductOut product = productController.findProduct(item.product().id()).getBody();
             item.product(product);
-            logger.debug(item.toString());
             item.total(item.qtd() * item.product().price());
-            logger.debug(item.toString());
 
             order.total(order.total() + item.total());
         });
@@ -51,10 +47,10 @@ public class OrderService {
         return saved;
     }
 
-    public List<Order> findAll() {
+    public List<Order> findAll(String idAccount) {
 
         List<Order> orders = StreamSupport
-            .stream(orderRepository.findAll().spliterator(), false)
+            .stream(orderRepository.findByUserId(idAccount).spliterator(), false)
             .map(OrderModel::to)
             .toList();
         
@@ -70,10 +66,16 @@ public class OrderService {
         return orders;
     }
 
-    public Order findById(String id) {
+    public Order findById(String idAccount, String id) {
 
         Order order = orderRepository.findById(id).orElse(null).to();
-        if (order == null) return null;
+        if (order == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        };
+
+        if (!order.account().id().equals(idAccount)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+        }
 
         order.itens(
             StreamSupport
